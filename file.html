@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File API</title>
+</head>
+<body>
+
+    <h1>File API - odczyt pliku</h1>
+
+    <input type="file" id="plik" accept=".txt,.json">
+
+    <h2>Zawartość pliku:</h2>
+    <pre id="wynik"></pre>
+
+    <script>
+        document.getElementById("plik").addEventListener("change", async function () {
+            const plik = this.files[0];
+
+            if (!plik) {
+                return;
+            }
+
+            try {
+                const tekst = await plik.text();
+
+                document.getElementById("wynik").textContent = tekst;
+            }
+            catch (blad) {
+                document.getElementById("wynik").textContent =
+                    "Nie udało się odczytać pliku";
+
+                console.error(blad);
+            }
+        });
+    </script>
+
+</body>
+</html>
