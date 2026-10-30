@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache API</title>
+</head>
+<body>
+
+    <h1>Cache API - odczyt pliku</h1>
+
+    <button id="zaczytaj">Zaczytaj</button>
+    <button id="odczytaj">Odczytaj z cache</button>
+
+    <h2>Zawartość pliku:</h2>
+    <p id="wynik"></p>
+
+    <script>
+        const CACHE_NAME = "cache-api-v1";
+        const FILE_URL = "./hello.txt";
+
+        const wynik = document.getElementById("wynik");
+
+        document.getElementById("zaczytaj").addEventListener("click", async () => {
+            try {
+                const cache = await caches.open(CACHE_NAME);
+
+                let odpowiedz = await cache.match(FILE_URL);
+
+                if (!odpowiedz) {
+                    odpowiedz = await fetch(FILE_URL);
+
+                    if (!odpowiedz.ok) {
+                        throw new Error("Błąd pobierania pliku");
+                    }
+
+                    await cache.put(FILE_URL, odpowiedz.clone());
+                }
+
+                const tekst = await odpowiedz.text();
+
+                wynik.textContent = tekst;
+            }
+            catch (blad) {
+                wynik.textContent = "Nie udało się pobrać pliku";
+                console.error(blad);
+            }
+        });
+
+        document.getElementById("odczytaj").addEventListener("click", async () => {
+            try {
+                const cache = await caches.open(CACHE_NAME);
+                const odpowiedz = await cache.match(FILE_URL);
+
+                if (odpowiedz) {
+                    const tekst = await odpowiedz.text();
+                    wynik.textContent = tekst;
+                }
+                else {
+                    wynik.textContent = "Brak pliku w cache";
+                }
+            }
+            catch (blad) {
+                wynik.textContent = "Błąd odczytu cache";
+                console.error(blad);
+            }
+        });
+    </script>
+
+</body>
+</html>
